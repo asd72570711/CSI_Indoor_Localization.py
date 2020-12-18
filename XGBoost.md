@@ -61,3 +61,52 @@ XGBoost = e**X**treme **G**radient **Boost**ing
 下方圖示進行簡單說明 L 和 &Omega;
 
 ![alt tag](https://i.imgur.com/AsV0DAI.png)
+
+***
+### 決策樹
+
+#### CART
+
+CART = **C**lassification **a**nd **R**egression **T**rees
+
+![Imgur](https://i.imgur.com/1P6pgEv.png)
+
+如上圖所示，我們希望將五個家族成員進行分類，而分進不同的分類，則稱此分類為不同的**葉子 (Leaf)**
+
+而每個葉子都有其權重，分配不同的權重給不同的葉子
+
+決策樹 (Decision Trees) 主要有兩種類型
+
+* 分類樹 (Classification Trees)
+* 回歸樹 (Regression Trees)
+
+**分類樹**的輸出是樣本的類標
+
+**回歸樹**的輸出是一個實數
+
+而 CART 則是上述兩種樹的結合
+
+常理來說，一棵樹並不足以用來訓練，因此我們需要很多不同的樹
+
+最直觀的方法即是將多顆樹之預測值 (Prediction Trees) 加總
+
+形成模型的集合體 (Esemble Model)
+
+![Imgur](https://i.imgur.com/q0N5yS2.png)
+
+上圖是兩顆樹的集合，可以看到兩棵樹是可以重合加總的
+
+以數學方程式表示之，可以將我們的模型寫作：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat&space;y_i&space;=&space;\sum_{k=1}^K&space;f_k(x_i)&space;,&space;f_k\in&space;F" title="\large \hat y_i = \sum_{k=1}^K f_k(x_i) , f_k\in F" />
+
+其中 K 是樹的數量，F 是所有可能的 CART 之集合，f 則是在集合 F 中的方程式
+
+因此我們可以得到目標方程式：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;obj(\theta)&space;=&space;\sum^n_i&space;l(y_i,\hat&space;y_i)&plus;\sum^K_{k=1}\Omega(f_k)" title="\large obj(\theta) = \sum^n_i l(y_i,\hat y_i)+\sum^K_{k=1}\Omega(f_k)" />
+
+此模型與**隨機森林(Random Forests)**相同，差別在於訓練方式的不同
+
+***
+### Tree Boosting
