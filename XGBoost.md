@@ -18,9 +18,9 @@ XGBoost = e**X**treme **G**radient **Boost**ing
 
 <br />
 
-其中 x<sub>i</sub> 為訓練資料，y<sub>i</sub> 為標籤 (Label)
+其中 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;x_i" title="\large x_i" /> 為訓練資料，<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;y_i" title="\large y_i" /> 為標籤 (Label)
 
-&theta; 是要利用資料來學習的參數，用以擬合 x<sub>i</sub> 和 y<sub>i</sub> 
+&theta; 是要利用資料來學習的參數，用以擬合 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;x_i" title="\large x_i" /> 和 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;y_i" title="\large y_i" /> 
 
 目的即是找出最佳的 &theta;
 
@@ -106,7 +106,49 @@ CART = **C**lassification **a**nd **R**egression **T**rees
 
 <img src="https://latex.codecogs.com/svg.latex?\large&space;obj(\theta)&space;=&space;\sum^n_i&space;l(y_i,\hat&space;y_i)&plus;\sum^K_{k=1}\Omega(f_k)" title="\large obj(\theta) = \sum^n_i l(y_i,\hat y_i)+\sum^K_{k=1}\Omega(f_k)" />
 
-此模型與**隨機森林(Random Forests)**相同，差別在於訓練方式的不同
+
+此模型與**隨機森林** **(Random Forests)** 相同，差別在於訓練方式的不同
 
 ***
 ### Tree Boosting
+
+訓練樹的方法 = 訓練監督式學習 = **定義且最佳化目標方程**
+
+令目標方程如下：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;obj&space;=&space;\sum^n_{i=1}l(y_i,\hat&space;y_i^{(t)})&plus;\sum&space;^t_{i=1}\Omega(f_i)" title="\large obj = \sum^n_{i=1}l(y_i,\hat y_i^{(t)})+\sum ^t_{i=1}\Omega(f_i)" />
+
+其中我們必須學習方程式 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;f_i" title="\large f_i" />
+
+每個 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;f_i" title="\large f_i" /> 包含了樹的結構以及葉子的分數
+
+相較於傳統利用梯度法最佳化的問題，樹結構的學習顯得更為艱難
+
+同時訓練所有樹也非常困難
+
+取而代之，固定我們已經學習的樹，並同時加進新的樹，是一個更是當的策略
+
+我們將第 t 步的預測值寫作 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;\hat&space;y_i^{(t)}" title="\large \hat y_i^{(t)}" /> 
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat&space;y_i^{(0)}&space;=&space;0" title="\large \hat y_i^{(0)} = 0" />
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat&space;y_i^{(1)}&space;=&space;f_1(x_i)&space;=&space;\hat&space;y_i^{(0)}&space;&plus;&space;f_1(x_i)" title="\large \hat y_i^{(1)} = f_1(x_i) = \hat y_i^{(0)} + f_1(x_i)" />
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat&space;y_i^{(2)}&space;=&space;f_1(x_i)&space;&plus;&space;f_2(x_i)&space;=&space;\hat&space;y_i^{(1)}&space;&plus;&space;f_2(x_i)" title="\large \hat y_i^{(2)} = f_1(x_i) + f_2(x_i) = \hat y_i^{(1)} + f_2(x_i)" />
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\vdots" title="\large \vdots" />
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\hat&space;y_i^{(t)}&space;=&space;\sum^t_{k=1}f_k(x_i)&space;=&space;\hat&space;y_i^{(t-1)}&space;&plus;&space;f_t(x_i)" title="\large \hat y_i^{(t)} = \sum^t_{k=1}f_k(x_i) = \hat y_i^{(t-1)} + f_t(x_i)" />
+
+每一個步驟加上能將我們的目標方程最佳化的樹，因此目標方程寫作：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;&=&space;\sum^n_{i=1}l(y_i,\hat&space;y_i^{(t)})&space;&plus;&space;\sum^t_{i=1}\Omega(f_i)&space;\\&space;&=&space;\sum^n_{i=1}l(y_i,\hat&space;y_i^{(t-1)}&space;&plus;&space;f_t(x_i))&space;&plus;&space;\Omega(f_t)&space;&plus;&space;constant&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} &= \sum^n_{i=1}l(y_i,\hat y_i^{(t)}) + \sum^t_{i=1}\Omega(f_i) \\ &= \sum^n_{i=1}l(y_i,\hat y_i^{(t-1)} + f_t(x_i)) + \Omega(f_t) + constant \end{aligned}" />
+
+
+
+
+
+
+
+
+
