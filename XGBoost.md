@@ -144,6 +144,30 @@ CART = **C**lassification **a**nd **R**egression **T**rees
 
 <img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;&=&space;\sum^n_{i=1}l(y_i,\hat&space;y_i^{(t)})&space;&plus;&space;\sum^t_{i=1}\Omega(f_i)&space;\\&space;&=&space;\sum^n_{i=1}l(y_i,\hat&space;y_i^{(t-1)}&space;&plus;&space;f_t(x_i))&space;&plus;&space;\Omega(f_t)&space;&plus;&space;constant&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} &= \sum^n_{i=1}l(y_i,\hat y_i^{(t)}) + \sum^t_{i=1}\Omega(f_i) \\ &= \sum^n_{i=1}l(y_i,\hat y_i^{(t-1)} + f_t(x_i)) + \Omega(f_t) + constant \end{aligned}" />
 
+若我們將**均方誤差 (MSE)** 當作我們的損失函數，則目標方程變成：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;&=&space;\sum^n_{i=1}(y_i-(\hat&space;y_i^{(t-1)}&plus;f_t(x_i)))^2&space;&plus;&space;\sum^t_{i=1}\Omega(f_i)&space;\\&space;&=&space;\sum^n_{i=1}[2(\hat&space;y_i^{(t-1)}-y_i)f_t(x_i)&plus;f_t(x_i)^2]&space;&plus;&space;\Omega(f_t)&space;&plus;&space;constant&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} &= \sum^n_{i=1}(y_i-(\hat y_i^{(t-1)}+f_t(x_i)))^2 + \sum^t_{i=1}\Omega(f_i) \\ &= \sum^n_{i=1}[2(\hat y_i^{(t-1)}-y_i)f_t(x_i)+f_t(x_i)^2] + \Omega(f_t) + constant \end{aligned}" />
+
+此步驟即是將上方的損失函數 <img src="https://latex.codecogs.com/svg.latex?\inline&space;L(\theta)" title="L(\theta)" /> 代入上面的 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;obj^{(t)}" title="\large obj^{(t)}" /> 的通式
+
+即
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;L(\theta)&space;=&space;\sum_i(y_i-\hat&space;y_i)^2" title="\large L(\theta) = \sum_i(y_i-\hat y_i)^2" />
+
+代入 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;obj^{(t)}" title="\large obj^{(t)}" /> 得到：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;=&&space;\sum_{i=1}^n(y_i-\hat&space;y_i)^2&space;&plus;&space;\sum_{i=1}^t\Omega(f_i)&space;\\&space;=&&space;\sum_{i=1}^n(y_i-(\hat&space;y^{(t-1)}_i&plus;f_t(x_i)))^2&space;&plus;&space;\sum_{i=1}^t\Omega(f_i)&space;\\&space;=&&space;\sum_{i=1}^n(y_i-(\hat&space;y^{(t-1)}_i&plus;f_t(x_i)))^2&space;&plus;&space;\Omega(f_t)&space;&plus;&space;constant&space;\\&space;=&&space;\sum_{i=1}^n(y_i-\hat&space;y^{(t-1)}_i)^2&space;&plus;&space;2(\hat&space;y_i^{(t-1)}-y_i)f_t(x_i)&space;&plus;&space;f_t(x_i)^2&space;&plus;\Omega(f_t)&space;&plus;&space;constant&space;\\&space;=&&space;\sum_{i=1}^n([2(\hat&space;y_i^{(t-1)}-y_i)f_t(x_i)&space;&plus;&space;f_t(x_i)^2]&space;&plus;\Omega(f_t)&space;&plus;&space;constant'&space;\\&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} =& \sum_{i=1}^n(y_i-\hat y_i)^2 + \sum_{i=1}^t\Omega(f_i) \\ =& \sum_{i=1}^n(y_i-(\hat y^{(t-1)}_i+f_t(x_i)))^2 + \sum_{i=1}^t\Omega(f_i) \\ =& \sum_{i=1}^n(y_i-(\hat y^{(t-1)}_i+f_t(x_i)))^2 + \Omega(f_t) + constant \\ =& \sum_{i=1}^n(y_i-\hat y^{(t-1)}_i)^2 + 2(\hat y_i^{(t-1)}-y_i)f_t(x_i) + f_t(x_i)^2 +\Omega(f_t) + constant \\ =& \sum_{i=1}^n([2(\hat y_i^{(t-1)}-y_i)f_t(x_i) + f_t(x_i)^2] +\Omega(f_t) + constant' \\ \end{aligned}" />
+
+若將**邏輯回歸**當作損失函數，則目標方程顯得十分複雜
+
+因此先將上方 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;obj^{(t)}" title="\large obj^{(t)}" /> 用**泰勒級數展開**至二階可得到：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;=&&space;\sum_{i=1}^nl(y_i,\hat&space;y_i^{(t)})&space;&plus;&space;\sum_{i=1}^t\Omega(f_i)&space;\\&space;=&&space;\sum_{i=1}^n[l(y_i,\hat&space;y_i^{(t-1)})&space;&plus;&space;\frac{\partial&space;l(y_i,\hat&space;y_i^{(t-1)})}{\partial(\hat&space;y_i^{(t-1)})}&space;f_t(x_i)&space;&plus;&space;\frac{1}{2}\frac{\partial&space;^2&space;l(y_i,\hat&space;y_i^{(t-1)})}{\partial&space;^2(\hat&space;y_i^{(t-1)})}&space;f_t(x_i)^2&space;&plus;&space;...]&space;&plus;&space;\Omega(f_t)&space;&plus;constant&space;\\&space;=&&space;\sum_{i=1}^n[l(y_i,\hat&space;y_i^{(t-1)})&space;&plus;&space;g_i&space;f_t(x_i)&space;&plus;&space;\frac{1}{2}h_i&space;f_t(x_i)^2&space;&plus;&space;...]&space;&plus;&space;\Omega(f_t)&space;&plus;constant&space;\\&space;=&&space;\sum_{i=1}^n[g_i&space;f_t(x_i)&space;&plus;&space;\frac{1}{2}h_i&space;f_t(x_i)^2&space;&plus;&space;...]&space;&plus;&space;\Omega(f_t)&space;&plus;constant'&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} =& \sum_{i=1}^nl(y_i,\hat y_i^{(t)}) + \sum_{i=1}^t\Omega(f_i) \\ =& \sum_{i=1}^n[l(y_i,\hat y_i^{(t-1)}) + \frac{\partial l(y_i,\hat y_i^{(t-1)})}{\partial(\hat y_i^{(t-1)})} f_t(x_i) + \frac{1}{2}\frac{\partial ^2 l(y_i,\hat y_i^{(t-1)})}{\partial ^2(\hat y_i^{(t-1)})} f_t(x_i)^2 + ...] + \Omega(f_t) +constant \\ =& \sum_{i=1}^n[l(y_i,\hat y_i^{(t-1)}) + g_i f_t(x_i) + \frac{1}{2}h_i f_t(x_i)^2 + ...] + \Omega(f_t) +constant \\ =& \sum_{i=1}^n[g_i f_t(x_i) + \frac{1}{2}h_i f_t(x_i)^2 + ...] + \Omega(f_t) +constant' \end{aligned}" />
+ 
+利用此表示法的優點在於最佳目標方程的值只與 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;g_i" title="\large g_i" /> 和 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;h_i" title="\large g_i" /> 有關
+
+應用這種方法，我們可以最佳化每一種損失函數！
+
 
 
 
