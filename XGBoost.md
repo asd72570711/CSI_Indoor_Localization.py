@@ -168,8 +168,62 @@ CART = **C**lassification **a**nd **R**egression **T**rees
 
 應用這種方法，我們可以最佳化每一種損失函數！
 
+#### 模型複雜性
 
+前面有提到訓練階段還有一個重要的部分，**正規項**
 
+因此我們需要定義樹的複雜度 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;\Omega&space;(f)" title="\large \Omega (f)" /> 
+
+為定義之，我們需要重新定義樹的定義 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;f(x)" title="\large f(x)" /> ：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;f_t(x)&space;=&space;w_{q(x)}&space;,&space;w&space;\in&space;R^T&space;,&space;q:R^d\rightarrow&space;{1,2,...,T}" title="\large f_t(x) = w_{q(x)} , w \in R^T , q:R^d\rightarrow {1,2,...,T}" />
+
+<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w" title="\large w" /> 係葉子的分數所構成之向量，
+<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;q" title="\large q" /> 是每個資料對應到的葉子的方程式，
+<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;T" title="\large T" /> 為葉子的數目
+
+在 XGBoost 的模型中，我們定義複雜度為：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\Omega&space;(f)&space;=&space;\gamma&space;T&space;&plus;&space;\frac{1}{2}&space;\lambda&space;\sum^T_{j=1}w_j^2" title="\large \Omega (f) = \gamma T + \frac{1}{2} \lambda \sum^T_{j=1}w_j^2" />
+
+當然還有其他對於複雜度的定義，但此時我們以這定義為例
+
+#### 分數架構
+
+透過上述那些方程式，我們可以重新寫出在第 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;t" title="\large t" /> 顆樹時的目標方程值為：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;obj^{(t)}&space;=&space;\sum^n_{i=1}[l(y_i,\hat&space;y_i^{(t-1)})&space;&plus;&space;g_if_t(x_i)&plus;\frac{1}{2}&space;h_if_t^2(x_i)]&plus;\gamma&space;T&space;&plus;\frac{1}{2}&space;\lambda&space;\sum^T_{j=1}w^2_j&space;&plus;&space;constant" title="\large obj^{(t)} = \sum^n_{i=1}[l(y_i,\hat y_i^{(t-1)}) + g_if_t(x_i)+\frac{1}{2} h_if_t^2(x_i)]+\gamma T +\frac{1}{2} \lambda \sum^T_{j=1}w^2_j + constant" />
+
+將我們重定義的 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;f_t(x)" title="\large f_t(x)" /> 代入：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;obj^{(t)}&space;=&&space;\sum^n_{i=1}[l(y_i,\hat&space;y_i^{(t-1)})&space;&plus;&space;g_iw_{q(x_i)}&plus;\frac{1}{2}&space;h_iw_{q(x_i)}^2]&plus;\gamma&space;T&space;&plus;\frac{1}{2}&space;\lambda&space;\sum^T_{j=1}w^2_j&space;&plus;&space;constant&space;\\&space;\approx&space;&&space;\sum^n_{i=1}[g_iw_{q(x_i)}&space;&plus;&space;\frac{1}{2}&space;h_iw_{q(x_i)}^2]&space;&plus;&space;\gamma&space;T&space;&plus;&space;\frac{1}{2}\lambda\sum^T_{j=1}w_j^2&space;\\&space;=&&space;\sum^T_{j=1}[(\sum_{i&space;\in&space;I_j}g_i)w_j&space;&plus;&space;\frac{1}{2}(\sum_{i&space;\in&space;I_j}h_i&plus;\lambda)w_j^2]&plus;\gamma&space;T&space;\\&space;\end{aligned}" title="\large \begin{aligned} obj^{(t)} =& \sum^n_{i=1}[l(y_i,\hat y_i^{(t-1)}) + g_iw_{q(x_i)}+\frac{1}{2} h_iw_{q(x_i)}^2]+\gamma T +\frac{1}{2} \lambda \sum^T_{j=1}w^2_j + constant \\ \approx & \sum^n_{i=1}[g_iw_{q(x_i)} + \frac{1}{2} h_iw_{q(x_i)}^2] + \gamma T + \frac{1}{2}\lambda\sum^T_{j=1}w_j^2 \\ =& \sum^T_{j=1}[(\sum_{i \in I_j}g_i)w_j + \frac{1}{2}(\sum_{i \in I_j}h_i+\lambda)w_j^2]+\gamma T \\ \end{aligned}" />
+
+其中 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;I_j&space;=&space;\{i|q(x_i)&space;=&space;j\}" title="\large I_j = \{i|q(x_i) = j\}" />
+是指派到第 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;j" title="\large j" /> 片葉子的指標資料點的集合
+
+而方程式能夠合併是因為所有資料分配到某片葉子的得分都會相同，簡單來說即 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w_{q(x_j)}&space;=&space;w_j" title="\large w_{q(x_j)} = w_j" />
+
+令 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;G_j&space;=&space;\sum_{i&space;\in&space;I_j}g_i&space;,&space;H_j&space;=&space;\sum_{i&space;\in&space;I_j}h_i" title="\large G_j = \sum_{i \in I_j}g_i , H_j = \sum_{i \in I_j}h_i" /> 可將方程改寫成：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;obj^{(t)}&space;=&space;\sum^T_{j=1}[G_jw_j&plus;\frac{1}{2}(H_j&plus;\lambda)w_j^2]&space;&plus;&space;\gamma&space;T" title="\large obj^{(t)} = \sum^T_{j=1}[G_jw_j+\frac{1}{2}(H_j+\lambda)w_j^2] + \gamma T" />
+
+式子中，<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w_j" title="\large w_j" /> 彼此獨立
+
+而 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;G_jw_j&space;&plus;&space;\frac{1}{2}(H_j&plus;\lambda)w_j^2" title="\large G_jw_j + \frac{1}{2}(H_j+\lambda)w_j^2" /> 是 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w_j" title="\large w_j" /> 的二次方程式
+
+通過簡單的運算可以得出 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w_j" title="\large w_j" /> 的最佳解：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;\begin{aligned}&space;G_jw_j&space;&plus;&space;\frac{1}{2}&space;(H_j&plus;\lambda)w_j^2&space;=&&space;0&space;\\&space;w_j[G_j&space;&plus;&space;\frac{1}{2}(H_j&plus;\lambda)w_j]&space;=&&space;0&space;\\&space;w_j(w_j&space;&plus;&space;\frac{2G_j}{H_j&plus;\lambda})&space;=&&space;0&space;\\&space;\end{aligned}" title="\large \begin{aligned} G_jw_j + \frac{1}{2} (H_j+\lambda)w_j^2 =& 0 \\ w_j[G_j + \frac{1}{2}(H_j+\lambda)w_j] =& 0 \\ w_j(w_j + \frac{2G_j}{H_j+\lambda}) =& 0 \\ \end{aligned}" />
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;w_j&space;=&space;0&space;\&space;,&space;-\frac{2G_j}{H_j&plus;\lambda}" title="\large w_j = 0 \ , -\frac{2G_j}{H_j+\lambda}" />
+
+我們將 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;w_j" title="\large w_j" /> 進行歸約，得到：
+
+<img src="https://latex.codecogs.com/svg.latex?\large&space;w_j^*&space;=&space;-\frac{G_j}{H_j&plus;\lambda}&space;\\&space;obj^*&space;=&space;-\frac{1}{2}\sum^T_{j=1}\frac{G_j^2}{H_j&plus;\lambda}&space;&plus;&space;\gamma&space;T" title="\large w_j^* = -\frac{G_j}{H_j+\lambda} \\ obj^* = -\frac{1}{2}\sum^T_{j=1}\frac{G_j^2}{H_j+\lambda} + \gamma T" />
+
+歸約(Reduction)：簡單來說就是將舊的問題換成新的問題，而解答一致
+
+<img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;obj^*" title="\large obj^*" /> 判斷樹的架構 <img src="https://latex.codecogs.com/svg.latex?\inline&space;\large&space;q(x)" title="\large q(x)" /> 的好壞
 
 
 
